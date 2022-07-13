@@ -1,6 +1,7 @@
 package br.com.jsa.infra.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class Procedimento implements Serializable {
 	@Id
 	private String id;
 	private String nome;
-	private Double valor;
+	private BigDecimal valor;
 	private Long tempoDuracao;
 	private LocalDateTime dataFimAtendimento;
 	private boolean ativo;
@@ -33,11 +34,11 @@ public class Procedimento implements Serializable {
 		this.nome = nome;
 	}
 
-	public Double getValor() {
+	public BigDecimal getValor() {
 		return valor;
 	}
 
-	public void setValor(Double valor) {
+	public void setValor(BigDecimal valor) {
 		this.valor = valor;
 	}
 

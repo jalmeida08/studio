@@ -53,7 +53,7 @@ public class ProcedimentoService {
 		
 		lstFuncionariosValidos.forEach(f -> {
 			if(!f.isValido()) 
-				throw new NegocioException("O funcionario com o id "+ f.getIdFuncionario() + " é invpalido");
+				throw new NegocioException("O funcionario com o id "+ f.getIdFuncionario() + " é inválido");
 		});
 		
 	}

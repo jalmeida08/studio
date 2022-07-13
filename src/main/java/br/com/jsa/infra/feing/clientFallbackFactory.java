@@ -1,5 +1,7 @@
 package br.com.jsa.infra.feing;
 
+import java.util.Optional;
+
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
@@ -18,12 +20,7 @@ public class clientFallbackFactory implements FallbackFactory<ClienteClient> {
 		return new ClienteClient() {
 
 			@Override
-			public void validaClientePorId(String id) {
-				throw new NegocioException(httpStatus);
-			}
-
-			@Override
-			public ClienteDTO buscaClientePorId(String id) {
+			public Optional<ClienteDTO> buscaClientePorId(String id) {
 				throw new NegocioException(httpStatus);
 			}
 		};

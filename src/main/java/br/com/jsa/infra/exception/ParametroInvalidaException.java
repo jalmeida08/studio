@@ -8,7 +8,6 @@ public class ParametroInvalidaException extends RuntimeException {
 
 	private static final long serialVersionUID = -216008925991767096L;
 
-
 	public ParametroInvalidaException(String message) {
 		super(message);
 	}

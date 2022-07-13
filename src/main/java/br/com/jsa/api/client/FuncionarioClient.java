@@ -1,6 +1,7 @@
 package br.com.jsa.api.client;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,5 +21,5 @@ public interface FuncionarioClient {
 	public List<FuncionarioDTO> consultaDadosListaFuncionario(List<String> funcionarios);
 	
 	@GetMapping("/{idFuncionario}")
-	public FuncionarioDTO consultaFuncionarioPorId(@PathVariable("idFuncionario") String id);
+	public Optional<FuncionarioDTO> consultaFuncionarioPorId(@PathVariable("idFuncionario") String id);
 }

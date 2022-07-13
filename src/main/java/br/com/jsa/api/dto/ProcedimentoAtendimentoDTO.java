@@ -2,11 +2,13 @@ package br.com.jsa.api.dto;
 
 import br.com.jsa.infra.model.Procedimento;
 
+import java.math.BigDecimal;
+
 public class ProcedimentoAtendimentoDTO {
 
 	private String id;
 	private String nome;
-	private Double valor;
+	private BigDecimal valor;
 	private Long tempoDuracao;
 	private boolean ativo;
 	
@@ -26,7 +28,7 @@ public class ProcedimentoAtendimentoDTO {
 		return nome;
 	}
 
-	public Double getValor() {
+	public BigDecimal getValor() {
 		return valor;
 	}
 

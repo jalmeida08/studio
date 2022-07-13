@@ -1,6 +1,7 @@
 package br.com.jsa.infra.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,8 @@ public class Atendimento implements Serializable {
 	private String id;
 	private String idCliente;
 	private String idFuncionario;
-	private Double valor;
-	private Float desconto;
+	private BigDecimal valor;
+	private BigDecimal desconto;
 	private LocalDateTime dataHoraAtendimento;
 	private LocalDateTime dataHoraFimAtendimento;
 	private EstadoAtendimento estadoAtendimento;
@@ -43,19 +44,19 @@ public class Atendimento implements Serializable {
 		this.idCliente = idCliente;
 	}
 
-	public Double getValor() {
+	public BigDecimal getValor() {
 		return valor;
 	}
 
-	public void setValor(Double valor) {
+	public void setValor(BigDecimal valor) {
 		this.valor = valor;
 	}
 
-	public Float getDesconto() {
+	public BigDecimal getDesconto() {
 		return desconto;
 	}
 
-	public void setDesconto(Float desconto) {
+	public void setDesconto(BigDecimal desconto) {
 		this.desconto = desconto;
 	}
 

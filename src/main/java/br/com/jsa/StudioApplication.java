@@ -15,10 +15,12 @@ import org.springframework.web.client.RestTemplate;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableFeignClients
-public class ProcedimentoApplication {
+@EnableSwagger2
+public class StudioApplication {
 	
 	@Bean
 	@LoadBalanced
@@ -45,7 +47,7 @@ public class ProcedimentoApplication {
 	
 
 	public static void main(String[] args) {
-		SpringApplication.run(ProcedimentoApplication.class, args);
+		SpringApplication.run(StudioApplication.class, args);
 	}
 
 }

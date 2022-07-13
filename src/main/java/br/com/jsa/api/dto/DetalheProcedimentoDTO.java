@@ -1,5 +1,6 @@
 package br.com.jsa.api.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import br.com.jsa.infra.model.Procedimento;
@@ -8,8 +9,8 @@ public class DetalheProcedimentoDTO {
 
 	private String id;
 	private String nome;
-	private Double valor;
-	private float tempoDuracao;
+	private BigDecimal valor;
+	private Long tempoDuracao;
 	private boolean ativo;
 	private List<FuncionarioDTO> funcionarios;
 
@@ -38,19 +39,19 @@ public class DetalheProcedimentoDTO {
 		this.nome = nome;
 	}
 
-	public Double getValor() {
+	public BigDecimal getValor() {
 		return valor;
 	}
 
-	public void setValor(Double valor) {
+	public void setValor(BigDecimal valor) {
 		this.valor = valor;
 	}
 
-	public float getTempoDuracao() {
+	public Long getTempoDuracao() {
 		return tempoDuracao;
 	}
 
-	public void setTempoDuracao(float tempoDuracao) {
+	public void setTempoDuracao(Long tempoDuracao) {
 		this.tempoDuracao = tempoDuracao;
 	}
 

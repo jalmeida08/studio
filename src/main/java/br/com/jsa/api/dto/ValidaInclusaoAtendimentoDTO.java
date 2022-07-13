@@ -7,7 +7,7 @@ import br.com.jsa.infra.model.Atendimento;
 
 public class ValidaInclusaoAtendimentoDTO {
 
-	private List<AtendimentoDTO> listaAtendimentoConflitante = new ArrayList<>();
+	private List<AtendimentoDTO> listaAtendimentoConflitante;
 	private AtendimentoDTO atendimentoSolicitado;
 
 	public ValidaInclusaoAtendimentoDTO(List<AtendimentoDTO> listaAtendimento, Atendimento atendimento) {

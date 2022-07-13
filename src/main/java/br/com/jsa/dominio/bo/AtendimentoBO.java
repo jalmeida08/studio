@@ -5,23 +5,30 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import br.com.jsa.dominio.validacao.ValidaDataAtendimento;
 import br.com.jsa.infra.exception.NegocioException;
 import br.com.jsa.infra.model.Atendimento;
 import br.com.jsa.infra.model.Procedimento;
 
 public class AtendimentoBO {
 
-	public Double calculaValorAtendimento(List<Procedimento> listaProcedimentoAtendimento, Float desconto) {
+	public BigDecimal calculaValorAtendimento(List<Procedimento> listaProcedimentoAtendimento, BigDecimal desconto) {
 		
 		var valor = listaProcedimentoAtendimento
 			.stream()
 			.map(a -> a.getValor())
-			.reduce(Double::sum)
-			.orElse(0D);
-		if(desconto != null && desconto > 0)
-			return new BigDecimal(valor - ((valor*desconto)/100)).setScale(2).doubleValue();
+			.reduce(BigDecimal::add)
+			.orElse(BigDecimal.ZERO);
+		if(desconto != null && desconto.compareTo(BigDecimal.ZERO) > 0)
+			return returnaValorAtendimentoComDesconto(valor, desconto);
 		else
-			return new BigDecimal(valor).setScale(2).doubleValue();
+			return valor.setScale(2);
+	}
+
+	private BigDecimal returnaValorAtendimentoComDesconto(BigDecimal valor, BigDecimal desconto) {
+		var cemPorCento = new BigDecimal(100);
+		var pencentual = valor.multiply(desconto.divide(cemPorCento));
+		return valor.subtract(pencentual);
 	}
 
 	public LocalDateTime calcularDataFimProcedimento(LocalDateTime dataAgendamento,
@@ -33,41 +40,32 @@ public class AtendimentoBO {
 				.reduce(Long::sum)
 				.orElseThrow(() -> new NegocioException("Não foi possível calcular o tempo de atendimento para os procedimentos listados"));
 		
-		return dataAgendamento.plusMinutes(somaTempoAtendimento); 
+		return dataAgendamento.plusMinutes(somaTempoAtendimento.longValue());
 		
 	}
 
-//	public boolean verificaDisponibilidadeAtenda(List<Atendimento> listaAtendimentoPeriodo,
-//			LocalDateTime dataHoraAtendimento, LocalDateTime dataHoraFimAtendimento) {
-//		return listaAtendimentoPeriodo
-//			.parallelStream()
-//			.filter(
-//					a -> (
-//							(a.getDataHoraAtendimento().isAfter(dataHoraAtendimento) || a.getDataHoraAtendimento().isEqual(dataHoraAtendimento))
-//							&& (a.getDataHoraAtendimento().isBefore(dataHoraFimAtendimento))
-//						  ) || (
-//							((a.getDataHoraAtendimento().isBefore(dataHoraAtendimento) || a.getDataHoraAtendimento().isEqual(dataHoraAtendimento))
-//									&& (a.getDataHoraFimAtendimento().isAfter(dataHoraFimAtendimento) || (
-//											a.getDataHoraFimAtendimento().isAfter(dataHoraAtendimento) && a.getDataHoraFimAtendimento().isBefore(dataHoraFimAtendimento)))
-//									)
-//							)							
-//					).findAny().isPresent(); 
-//	}
-	
+
 	public List<Atendimento> listarAtendimentosNoMesmoHorario(List<Atendimento> listaAtendimentoPeriodo,
 			LocalDateTime dataHoraAtendimento, LocalDateTime dataHoraFimAtendimento) {
+		
 		return listaAtendimentoPeriodo
 			.parallelStream()
-			.filter(
-					a -> (
-							(a.getDataHoraAtendimento().isAfter(dataHoraAtendimento) || a.getDataHoraAtendimento().isEqual(dataHoraAtendimento))
-							&& (a.getDataHoraAtendimento().isBefore(dataHoraFimAtendimento))
-						  ) || (
-							((a.getDataHoraAtendimento().isBefore(dataHoraAtendimento) || a.getDataHoraAtendimento().isEqual(dataHoraAtendimento))
-									&& (a.getDataHoraFimAtendimento().isAfter(dataHoraFimAtendimento) || (
-											a.getDataHoraFimAtendimento().isAfter(dataHoraAtendimento) && a.getDataHoraFimAtendimento().isBefore(dataHoraFimAtendimento)))
-									)
-							)							
-					).collect(Collectors.toList()); 
+			.filter(a -> (verificaInicioDataAtendimento(a, dataHoraAtendimento, dataHoraFimAtendimento)) 
+					|| (verificaDataMeioFimAtendimento(a, dataHoraAtendimento, dataHoraFimAtendimento)))
+			.collect(Collectors.toList()); 
+	}
+
+	private boolean verificaInicioDataAtendimento(Atendimento atendimento, LocalDateTime dataHoraAtendimento,
+			LocalDateTime dataHoraFimAtendimento) {
+		
+		return ValidaDataAtendimento
+			.testaInicioDatasAtendimento(atendimento.getDataHoraAtendimento(), dataHoraAtendimento, dataHoraFimAtendimento);
+	}
+
+	private boolean verificaDataMeioFimAtendimento(Atendimento atendimento, LocalDateTime dataHoraAtendimento,
+			LocalDateTime dataHoraFimAtendimento) {
+		return ValidaDataAtendimento
+				.testaMeioFimDatasAtendimento(atendimento.getDataHoraAtendimento(), atendimento.getDataHoraFimAtendimento(),
+						dataHoraAtendimento, dataHoraFimAtendimento);
 	}
 }

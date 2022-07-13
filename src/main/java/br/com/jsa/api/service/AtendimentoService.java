@@ -1,5 +1,6 @@
 package br.com.jsa.api.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,6 +25,9 @@ import br.com.jsa.api.dto.ValidaInclusaoAtendimentoDTO;
 import br.com.jsa.api.form.AtendimentoForm;
 import br.com.jsa.api.form.EditaAtendimentoForm;
 import br.com.jsa.dominio.bo.AtendimentoBO;
+import br.com.jsa.dominio.validacao.ValidaFuncionarioAtendimento;
+import br.com.jsa.dominio.validacao.ValidaIdCliente;
+import br.com.jsa.dominio.validacao.ValidaIdFuncionario;
 import br.com.jsa.infra.exception.NegocioException;
 import br.com.jsa.infra.exception.ParametroInvalidaException;
 import br.com.jsa.infra.model.Atendimento;
@@ -60,7 +64,7 @@ public class AtendimentoService {
 			.orElseThrow(() -> new ParametroInvalidaException("Procedimento informado não foi encontrado na base de dados"));
 	}
 
-	private Double efetuarCalculoProcedimento(List<Procedimento> listaProcedimentoAtendimento, Float desconto) {
+	private BigDecimal efetuarCalculoProcedimento(List<Procedimento> listaProcedimentoAtendimento, BigDecimal desconto) {
 		return new AtendimentoBO()
 				.calculaValorAtendimento(listaProcedimentoAtendimento, desconto);
 	}
@@ -71,12 +75,7 @@ public class AtendimentoService {
 			.forEach( p -> listaProcedimento.add(buscaProcedimentoDoAtendimento(p)));
 		return listaProcedimento;
 	}
-	
-//	private List<Atendimento> buscaAtendimentoPeriodo(
-//			LocalDateTime dataHora1, LocalDateTime dataHora2, String estadoAtendimento){
-//		
-//		return atendimentoRepository.findByDataHoraAtendimentoBetweenAndEstadoAtendimento(dataHora1, dataHora2, estadoAtendimento); 
-//	}
+
 	private List<Atendimento> buscaAtendimentoPeriodoFuncionario(
 			LocalDateTime dataHora1, LocalDateTime dataHora2, String estadoAtendimento, String idFuncionario){
 		return 
@@ -99,24 +98,42 @@ public class AtendimentoService {
 	}
 	
 	public void adicionaAtendimento(AtendimentoForm atendimentoForm) {
-			Atendimento a = atendimentoForm.toAtendimento();
-			final var listaProcedimentoAtendimento = buscaListaProcedimentos(a.getProcedimentos());
-			
-			var dataFimProcedimento = new AtendimentoBO()
-					.calcularDataFimProcedimento(a.getDataHoraAtendimento(), listaProcedimentoAtendimento);
-			
-			a.setDataHoraFimAtendimento(dataFimProcedimento);
-			
-			var listaAtendimentoConflitantes = 
-					consultaSepossuiAtendimentosConflitantes(
-							atendimentoForm.getIdFuncionario(), a.getDataHoraAtendimento(), a.getDataHoraFimAtendimento());
-			
-			if(!listaAtendimentoConflitantes.isEmpty())
-				throw new NegocioException("O horário informado colide com outros atendimentos");
-			
-			clienteClient.validaClientePorId(a.getIdCliente());
-			a.setValor(efetuarCalculoProcedimento(listaProcedimentoAtendimento, a.getDesconto()));
-			atendimentoRepository.save(a);
+		Atendimento a = atendimentoForm.toAtendimento();
+		
+		validaidCliente(a.getIdCliente());
+		validaIdFuncionario(a.getIdFuncionario());
+		
+		var listaProcedimentoAtendimento = buscaListaProcedimentos(a.getProcedimentos());
+		
+		ValidaFuncionarioAtendimento
+			.validaSeFuncionarioPodeAtender(listaProcedimentoAtendimento, a.getIdFuncionario());
+		
+		var dataFimProcedimento = new AtendimentoBO()
+				.calcularDataFimProcedimento(a.getDataHoraAtendimento(), listaProcedimentoAtendimento);
+		
+		a.setDataHoraFimAtendimento(dataFimProcedimento);
+		
+		var listaAtendimentoConflitantes = 
+				consultaSepossuiAtendimentosConflitantes(
+						atendimentoForm.getIdFuncionario(), a.getDataHoraAtendimento(), a.getDataHoraFimAtendimento());
+		
+		if(!listaAtendimentoConflitantes.isEmpty())
+			throw new NegocioException("O horário informado colide com outros atendimentos");
+		
+		a.setValor(efetuarCalculoProcedimento(listaProcedimentoAtendimento, a.getDesconto()));
+		atendimentoRepository.save(a);
+	}
+
+	private FuncionarioDTO validaIdFuncionario(String id) {
+		var funcionario = funcionarioClient.consultaFuncionarioPorId(id);
+		return new ValidaIdFuncionario()
+				.identificadorIsValid(id, funcionario);	
+	}
+
+	private ClienteDTO validaidCliente(String id) {
+		var cliente = clienteClient.buscaClientePorId(id);
+		return new ValidaIdCliente()
+				.identificadorIsValid(id, cliente);
 	}
 
 	public ValidaInclusaoAtendimentoDTO validaEdicaoAtendimento(EditaAtendimentoForm form) {
@@ -158,12 +175,12 @@ public class AtendimentoService {
 		return bo.listarAtendimentosNoMesmoHorario(listaAtendimentoPeriodo, dataHoraAtendimento, dataHoraFimAtendimento);
 	}
 
-	public Double calculaValorAtendimento(List<String> listaProcedimentos, Float desconto) {
+	public BigDecimal calculaValorAtendimento(List<String> listaProcedimentos, BigDecimal desconto) {
 		return efetuarCalculoProcedimento(buscaListaProcedimentos(listaProcedimentos), desconto);
 	}
 
 	public ClienteDTO consultarDadosCliente(String id) {
-		return clienteClient.buscaClientePorId(id);
+		return validaidCliente(id);
 	}
 
 	public List<AtendimentoDTO> listaAtendimento() {
@@ -215,8 +232,8 @@ public class AtendimentoService {
 			.findByDataHoraAtendimentoBetweenAndEstadoAtendimentoInOrderByDataHoraAtendimentoAsc(
 					dataInicio, dataFim, listaEstadoAtendimento)
 			.forEach(a -> {
-				var c = clienteClient.buscaClientePorId(a.getIdCliente());
-				var f = funcionarioClient.consultaFuncionarioPorId(a.getIdFuncionario());
+				var c = validaidCliente(a.getIdCliente());
+				var f = validaIdFuncionario(a.getIdFuncionario());
 				listaAtendimento.add(new AtendimentoHomeDTO(a, c, f));
 			});
 		return listaAtendimento;
@@ -239,8 +256,8 @@ public class AtendimentoService {
 
 	public AtendimentoDetalhadoDTO consultaDadosAtendimento(String id) {
 		Atendimento a = getAtendimento(id);
-		ClienteDTO c = clienteClient.buscaClientePorId(a.getIdCliente());
-		FuncionarioDTO f = funcionarioClient.consultaFuncionarioPorId(a.getIdFuncionario());
+		ClienteDTO c = validaidCliente(a.getIdCliente());
+		FuncionarioDTO f = validaIdFuncionario(a.getIdFuncionario());
 		var listaProcedimento = a.getProcedimentos()
 			.stream()
 			.map(p -> new ProcedimentoAtendimentoDTO(procedimentoRepository.findById(p).get()))

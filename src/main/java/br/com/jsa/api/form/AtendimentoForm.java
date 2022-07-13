@@ -1,5 +1,6 @@
 package br.com.jsa.api.form;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ public class AtendimentoForm {
 	@NotBlank(message = "É obrigatório informar a qual cliente pertence esse atendimento")
 	private String idCliente;
 	private String idFuncionario;
-	private Float desconto;
+	private BigDecimal desconto;
 //	@NotBlank(message = "Data agendamento é obrigatório")
 	private LocalDateTime dataHoraAtendimento;
 	private EstadoAtendimento estadoAtendimento;
@@ -33,7 +34,7 @@ public class AtendimentoForm {
 		return a;
 	}
 
-	public void setDesconto(Float desconto) {
+	public void setDesconto(BigDecimal desconto) {
 		this.desconto = desconto;
 	}
 
@@ -57,7 +58,7 @@ public class AtendimentoForm {
 		return idCliente;
 	}
 
-	public Float getDesconto() {
+	public BigDecimal getDesconto() {
 		return desconto;
 	}
 

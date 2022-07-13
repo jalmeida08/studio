@@ -1,5 +1,6 @@
 package br.com.jsa.api.form;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import br.com.jsa.infra.model.Procedimento;
 public class ProcedimentoForm {
 
 	private String nome;
-	private Double valor;
+	private BigDecimal valor;
 	private Long tempoDuracao;
 	private Boolean ativo;
 	private List<String> idFuncionario = new ArrayList<String>();
@@ -31,15 +32,15 @@ public class ProcedimentoForm {
 		this.nome = nome;
 	}
 
-	public Double getValor() {
+	public BigDecimal getValor() {
 		return valor;
 	}
 
-	public void setValor(Double valor) {
+	public void setValor(BigDecimal valor) {
 		this.valor = valor;
 	}
 
-	public float getTempoDuracao() {
+	public Long getTempoDuracao() {
 		return tempoDuracao;
 	}
 

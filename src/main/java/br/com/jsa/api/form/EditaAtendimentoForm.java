@@ -1,5 +1,6 @@
 package br.com.jsa.api.form;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 public class EditaAtendimentoForm {
 	
 	private String id;
-	private Float desconto;
+	private BigDecimal desconto;
 	private LocalDateTime dataHoraAtendimento;
 	private List<String> procedimentos = new ArrayList<>();
 
@@ -19,11 +20,11 @@ public class EditaAtendimentoForm {
 		this.id = id;
 	}
 
-	public Float getDesconto() {
+	public BigDecimal getDesconto() {
 		return desconto;
 	}
 
-	public void setDesconto(Float desconto) {
+	public void setDesconto(BigDecimal desconto) {
 		this.desconto = desconto;
 	}
 

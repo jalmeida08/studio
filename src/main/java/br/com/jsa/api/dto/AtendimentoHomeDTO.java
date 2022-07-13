@@ -1,5 +1,6 @@
 package br.com.jsa.api.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +13,8 @@ public class AtendimentoHomeDTO {
 	private String id;
 	private ClienteDTO cliente;
 	private FuncionarioDTO funcionario;
-	private Double valor;
-	private Float desconto;
+	private BigDecimal valor;
+	private BigDecimal desconto;
 	private LocalDateTime dataHoraAtendimento;
 	private LocalDateTime dataHoraFimAtendimento;
 	private EstadoAtendimento estadoAtendimento;
@@ -35,11 +36,11 @@ public class AtendimentoHomeDTO {
 		return id;
 	}
 
-	public Double getValor() {
+	public BigDecimal getValor() {
 		return valor;
 	}
 
-	public Float getDesconto() {
+	public BigDecimal getDesconto() {
 		return desconto;
 	}
 
