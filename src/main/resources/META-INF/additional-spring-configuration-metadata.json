@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "app.kafka.producer.pessoa.nova-pessoa.topic",
+    "type": "java.lang.String",
+    "description": "A description for 'app.kafka.producer.pessoa.nova-pessoa.topic'"
+  },
+  {
+    "name": "app.kafka.producer.funcionario.novo-funcionario.topic",
+    "type": "java.lang.String",
+    "description": "A description for 'app.kafka.producer.funcionario.novo-funcionario.topic'"
+  }
+]}

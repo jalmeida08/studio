@@ -12,29 +12,27 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.jsa.api.client.ClienteClient;
-import br.com.jsa.api.client.FuncionarioClient;
+import br.com.jsa.api.client.PessoaClient;
 import br.com.jsa.api.dto.AtendimentoDTO;
 import br.com.jsa.api.dto.AtendimentoDetalhadoDTO;
 import br.com.jsa.api.dto.AtendimentoHomeDTO;
 import br.com.jsa.api.dto.BuscaDadosAgendaFuncionarioDTO;
 import br.com.jsa.api.dto.ClienteDTO;
-import br.com.jsa.api.dto.FuncionarioDTO;
 import br.com.jsa.api.dto.ProcedimentoAtendimentoDTO;
 import br.com.jsa.api.dto.ValidaInclusaoAtendimentoDTO;
 import br.com.jsa.api.form.AtendimentoForm;
 import br.com.jsa.api.form.EditaAtendimentoForm;
 import br.com.jsa.dominio.bo.AtendimentoBO;
+import br.com.jsa.dominio.model.Atendimento;
+import br.com.jsa.dominio.model.EstadoAtendimento;
+import br.com.jsa.dominio.model.Funcionario;
+import br.com.jsa.dominio.model.Procedimento;
+import br.com.jsa.dominio.repository.AtendimentoRepository;
+import br.com.jsa.dominio.repository.ProcedimentoRepository;
 import br.com.jsa.dominio.validacao.ValidaFuncionarioAtendimento;
-import br.com.jsa.dominio.validacao.ValidaIdCliente;
 import br.com.jsa.dominio.validacao.ValidaIdFuncionario;
 import br.com.jsa.infra.exception.NegocioException;
 import br.com.jsa.infra.exception.ParametroInvalidaException;
-import br.com.jsa.infra.model.Atendimento;
-import br.com.jsa.infra.model.EstadoAtendimento;
-import br.com.jsa.infra.model.Procedimento;
-import br.com.jsa.infra.repository.AtendimentoRepository;
-import br.com.jsa.infra.repository.ProcedimentoRepository;
 import br.com.jsa.util.DateUtil;
 
 @Service
@@ -47,10 +45,10 @@ public class AtendimentoService {
 	private ProcedimentoRepository procedimentoRepository;
 	
 	@Autowired
-	private ClienteClient clienteClient;
+	private PessoaClient pessoaClient;
 	
 	@Autowired
-	private FuncionarioClient funcionarioClient;
+	private FuncionarioService funcionarioService;
 	
 	private Atendimento getAtendimento(String id) {
 		return atendimentoRepository
@@ -98,43 +96,43 @@ public class AtendimentoService {
 	}
 	
 	public void adicionaAtendimento(AtendimentoForm atendimentoForm) {
-		Atendimento a = atendimentoForm.toAtendimento();
-		
-		validaidCliente(a.getIdCliente());
-		validaIdFuncionario(a.getIdFuncionario());
-		
-		var listaProcedimentoAtendimento = buscaListaProcedimentos(a.getProcedimentos());
-		
-		ValidaFuncionarioAtendimento
-			.validaSeFuncionarioPodeAtender(listaProcedimentoAtendimento, a.getIdFuncionario());
-		
-		var dataFimProcedimento = new AtendimentoBO()
-				.calcularDataFimProcedimento(a.getDataHoraAtendimento(), listaProcedimentoAtendimento);
-		
-		a.setDataHoraFimAtendimento(dataFimProcedimento);
-		
-		var listaAtendimentoConflitantes = 
-				consultaSepossuiAtendimentosConflitantes(
-						atendimentoForm.getIdFuncionario(), a.getDataHoraAtendimento(), a.getDataHoraFimAtendimento());
-		
-		if(!listaAtendimentoConflitantes.isEmpty())
-			throw new NegocioException("O horário informado colide com outros atendimentos");
-		
-		a.setValor(efetuarCalculoProcedimento(listaProcedimentoAtendimento, a.getDesconto()));
-		atendimentoRepository.save(a);
+//		Atendimento a = atendimentoForm.toAtendimento();
+//		
+//		validaidCliente(a.getIdCliente());
+//		validaIdFuncionario(a.getIdFuncionario());
+//		
+//		var listaProcedimentoAtendimento = buscaListaProcedimentos(a.getProcedimentos());
+//		
+//		ValidaFuncionarioAtendimento
+//			.validaSeFuncionarioPodeAtender(listaProcedimentoAtendimento, a.getIdFuncionario());
+//		
+//		var dataFimProcedimento = new AtendimentoBO()
+//				.calcularDataFimProcedimento(a.getDataHoraAtendimento(), listaProcedimentoAtendimento);
+//		
+//		a.setDataHoraFimAtendimento(dataFimProcedimento);
+//		
+//		var listaAtendimentoConflitantes = 
+//				consultaSepossuiAtendimentosConflitantes(
+//						atendimentoForm.getIdFuncionario(), a.getDataHoraAtendimento(), a.getDataHoraFimAtendimento());
+//		
+//		if(!listaAtendimentoConflitantes.isEmpty())
+//			throw new NegocioException("O horário informado colide com outros atendimentos");
+//		
+//		a.setValor(efetuarCalculoProcedimento(listaProcedimentoAtendimento, a.getDesconto()));
+//		atendimentoRepository.save(a);
 	}
 
-	private FuncionarioDTO validaIdFuncionario(String id) {
-		var funcionario = funcionarioClient.consultaFuncionarioPorId(id);
+	private Funcionario validaIdFuncionario(String id) {
+		var funcionario = funcionarioService.consultaFuncionarioPorId(id);
 		return new ValidaIdFuncionario()
 				.identificadorIsValid(id, funcionario);	
 	}
 
-	private ClienteDTO validaidCliente(String id) {
-		var cliente = clienteClient.buscaClientePorId(id);
-		return new ValidaIdCliente()
-				.identificadorIsValid(id, cliente);
-	}
+//	private ClienteDTO validaidCliente(String id) {
+//		var cliente = clienteClient.buscaClientePorId(id);
+//		return new ValidaIdCliente()
+//				.identificadorIsValid(id, cliente);
+//	}
 
 	public ValidaInclusaoAtendimentoDTO validaEdicaoAtendimento(EditaAtendimentoForm form) {
 		var a = getAtendimento(form.getId());
@@ -180,7 +178,8 @@ public class AtendimentoService {
 	}
 
 	public ClienteDTO consultarDadosCliente(String id) {
-		return validaidCliente(id);
+//		return validaidCliente(id);
+		return null;
 	}
 
 	public List<AtendimentoDTO> listaAtendimento() {
@@ -224,21 +223,21 @@ public class AtendimentoService {
 	}
 	
 	public List<AtendimentoHomeDTO> listaAtendimentoDiaInformado(LocalDate dataInformada) {
-		final var dataInicio = dataInformada.atTime(LocalTime.MIN);
-		final var dataFim = dataInformada.atTime(LocalTime.MAX);
-		var listaAtendimento = new ArrayList<AtendimentoHomeDTO>();
-		var listaEstadoAtendimento = List.of(EstadoAtendimento.AGENDADO.name(), EstadoAtendimento.FINALIZADO.name());
-		atendimentoRepository
-			.findByDataHoraAtendimentoBetweenAndEstadoAtendimentoInOrderByDataHoraAtendimentoAsc(
-					dataInicio, dataFim, listaEstadoAtendimento)
-			.forEach(a -> {
-				var c = validaidCliente(a.getIdCliente());
-				var f = validaIdFuncionario(a.getIdFuncionario());
-				listaAtendimento.add(new AtendimentoHomeDTO(a, c, f));
-			});
-		return listaAtendimento;
+//		final var dataInicio = dataInformada.atTime(LocalTime.MIN);
+//		final var dataFim = dataInformada.atTime(LocalTime.MAX);
+//		var listaAtendimento = new ArrayList<AtendimentoHomeDTO>();
+//		var listaEstadoAtendimento = List.of(EstadoAtendimento.AGENDADO.name(), EstadoAtendimento.FINALIZADO.name());
+//		atendimentoRepository
+//			.findByDataHoraAtendimentoBetweenAndEstadoAtendimentoInOrderByDataHoraAtendimentoAsc(
+//					dataInicio, dataFim, listaEstadoAtendimento)
+//			.forEach(a -> {
+//				var c = validaidCliente(a.getIdCliente());
+//				var f = validaIdFuncionario(a.getIdFuncionario());
+//				listaAtendimento.add(new AtendimentoHomeDTO(a, c, f));
+//			});
+//		return listaAtendimento;
 			
-			
+		return null;
 	}
 
 	public List<AtendimentoDTO> buscaAgendaFuncionarioDia(BuscaDadosAgendaFuncionarioDTO buscaAgenda) {
@@ -255,16 +254,17 @@ public class AtendimentoService {
 	}
 
 	public AtendimentoDetalhadoDTO consultaDadosAtendimento(String id) {
-		Atendimento a = getAtendimento(id);
-		ClienteDTO c = validaidCliente(a.getIdCliente());
-		FuncionarioDTO f = validaIdFuncionario(a.getIdFuncionario());
-		var listaProcedimento = a.getProcedimentos()
-			.stream()
-			.map(p -> new ProcedimentoAtendimentoDTO(procedimentoRepository.findById(p).get()))
-			.collect(Collectors.toList());
-
-			
-		return new AtendimentoDetalhadoDTO(a, c, f, listaProcedimento);
+//		Atendimento a = getAtendimento(id);
+//		ClienteDTO c = validaidCliente(a.getIdCliente());
+//		Funcionario f = validaIdFuncionario(a.getIdFuncionario());
+//		var listaProcedimento = a.getProcedimentos()
+//			.stream()
+//			.map(p -> new ProcedimentoAtendimentoDTO(procedimentoRepository.findById(p).get()))
+//			.collect(Collectors.toList());
+//
+//			
+//		return new AtendimentoDetalhadoDTO(a, c, f, listaProcedimento);
+		return null;
 	}
 
 	public void editaAtendimento(EditaAtendimentoForm form) {

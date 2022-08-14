@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import br.com.jsa.dominio.model.Atendimento;
+import br.com.jsa.dominio.model.Procedimento;
 import br.com.jsa.dominio.validacao.ValidaDataAtendimento;
 import br.com.jsa.infra.exception.NegocioException;
-import br.com.jsa.infra.model.Atendimento;
-import br.com.jsa.infra.model.Procedimento;
 
 public class AtendimentoBO {
 

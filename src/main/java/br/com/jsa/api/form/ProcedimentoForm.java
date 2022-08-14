@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.jsa.infra.model.Procedimento;
+import br.com.jsa.dominio.model.Procedimento;
 
 public class ProcedimentoForm {
 

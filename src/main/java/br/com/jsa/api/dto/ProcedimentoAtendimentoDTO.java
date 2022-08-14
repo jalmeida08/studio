@@ -1,8 +1,8 @@
 package br.com.jsa.api.dto;
 
-import br.com.jsa.infra.model.Procedimento;
-
 import java.math.BigDecimal;
+
+import br.com.jsa.dominio.model.Procedimento;
 
 public class ProcedimentoAtendimentoDTO {
 

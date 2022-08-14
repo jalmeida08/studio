@@ -5,6 +5,23 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant-path-matcher
+  kafka:
+    producer:
+      bootstrap-servers:
+      - "http://localhost:9092"
+      key-serializer:
+        org.apache.kafka.common.serialization.StringSerializer
+      value-serializer:
+        org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      bootstrap-servers:
+      - "http://localhost:9092"
+      group-id: group-id
+      auto-offset-reset: earliest
+      key-deserializer:
+        org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer:
+        org.apache.kafka.common.serialization.ByteArrayDeserializer
 
 eureka:
   client:
@@ -24,3 +41,10 @@ security:
 logging:
   level:
     '[org.springframework.data.mongodb.core.MongoTemplate]': debug
+  
+app:
+  kafka:
+    producer:
+      funcionario:
+        novo-funcionario:
+          topic: STUDIO_NOVO_FUNCIONARIO

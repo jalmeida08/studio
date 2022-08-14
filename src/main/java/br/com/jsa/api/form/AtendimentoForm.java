@@ -8,8 +8,8 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import br.com.jsa.infra.model.Atendimento;
-import br.com.jsa.infra.model.EstadoAtendimento;
+import br.com.jsa.dominio.model.Atendimento;
+import br.com.jsa.dominio.model.EstadoAtendimento;
 
 public class AtendimentoForm {
 

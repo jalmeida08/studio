@@ -3,7 +3,7 @@ package br.com.jsa.api.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.jsa.infra.model.Atendimento;
+import br.com.jsa.dominio.model.Atendimento;
 
 public class ValidaInclusaoAtendimentoDTO {
 

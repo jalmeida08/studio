@@ -2,32 +2,30 @@ package br.com.jsa.api.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.jsa.api.client.FuncionarioClient;
 import br.com.jsa.api.dto.AdicionaFuncionarioProcedimentoDTO;
 import br.com.jsa.api.dto.DetalheProcedimentoDTO;
 import br.com.jsa.api.dto.FuncionarioDTO;
 import br.com.jsa.api.dto.ProcedimentoDTO;
-import br.com.jsa.api.dto.VerificaIdFuncionarioDTO;
 import br.com.jsa.api.form.ProcedimentoForm;
+import br.com.jsa.dominio.model.Procedimento;
+import br.com.jsa.dominio.repository.ProcedimentoRepository;
 import br.com.jsa.infra.exception.NegocioException;
 import br.com.jsa.infra.exception.ParametroInvalidaException;
-import br.com.jsa.infra.model.Procedimento;
-import br.com.jsa.infra.repository.ProcedimentoRepository;
 
 @Service
 public class ProcedimentoService {
 	
 	@Autowired
 	private ProcedimentoRepository procedimentoRepository;
-	
-	@Autowired
-	private FuncionarioClient funcionarioClient;
 
+	@Autowired
+	private FuncionarioService funcionarioService;
 
 	private Procedimento buscaProcedimentoPorId(String id) {
 		return procedimentoRepository
@@ -46,14 +44,14 @@ public class ProcedimentoService {
 		}
 	}
 
-	private void idFuncionarioIsValid(List<String> idFuncionario) throws NegocioException{
+	private void idFuncionarioIsValid(List<String> listaIdFuncionario) throws NegocioException{
 		
-		List<VerificaIdFuncionarioDTO> lstFuncionariosValidos =
-				this.funcionarioClient.idFuncionarioIsValid(idFuncionario);
+		Map<String, Boolean> lstFuncionariosValidos =
+				this.funcionarioService.idFuncionarioIsValid(listaIdFuncionario);
 		
-		lstFuncionariosValidos.forEach(f -> {
-			if(!f.isValido()) 
-				throw new NegocioException("O funcionario com o id "+ f.getIdFuncionario() + " é inválido");
+		lstFuncionariosValidos.forEach((id, isValid) -> {
+			if(!isValid) 
+				throw new NegocioException("O funcionario com a chave informada "+ id + " é inválido");
 		});
 		
 	}
@@ -63,7 +61,7 @@ public class ProcedimentoService {
 				.findAll()
 				.stream()
 				.map(ProcedimentoDTO::new)
-				.collect(Collectors.toList());
+				.collect(Collectors.toUnmodifiableList());
 	}
 
 	public DetalheProcedimentoDTO consultaProcedimento(String id) {
@@ -71,22 +69,18 @@ public class ProcedimentoService {
 		List<FuncionarioDTO> lstDadosFunci = new ArrayList<FuncionarioDTO>();
 		if(p.getFuncionarios().size() > 0) 
 			lstDadosFunci =
-					funcionarioClient.consultaDadosListaFuncionario(p.getFuncionarios());
+					funcionarioService.consultaDadosListaFuncionario(p.getFuncionarios());
 		
 		return new DetalheProcedimentoDTO(p, lstDadosFunci);
 	}
 
 	public void adicionaFuncionarioProcedimento(AdicionaFuncionarioProcedimentoDTO dto) {
-		var count = funcionarioClient
-			.idFuncionarioIsValid(List.of(dto.getIdFuncionario()))
-			.stream()
-			.filter(a-> !a.isValido())
-			.count();
+		final var isValid = funcionarioService.idIsValid(dto.getIdFuncionario());
 		
-		if(count > 0)
-			throw new NegocioException("Codigo de funcionario inválido");
+		if(!isValid)
+			new NegocioException("Codigo de funcionario inválido");
 		
-		Procedimento p = buscaProcedimentoPorId(dto.getIdProcedimento());
+		var p = buscaProcedimentoPorId(dto.getIdProcedimento());
 		p.getFuncionarios().add(dto.getIdFuncionario());
 		procedimentoRepository.save(p);
 	}

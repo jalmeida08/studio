@@ -5,14 +5,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.jsa.infra.model.Atendimento;
-import br.com.jsa.infra.model.EstadoAtendimento;
+import br.com.jsa.dominio.model.Atendimento;
+import br.com.jsa.dominio.model.EstadoAtendimento;
+import br.com.jsa.dominio.model.Funcionario;
 
 public class AtendimentoHomeDTO {
 
 	private String id;
 	private ClienteDTO cliente;
-	private FuncionarioDTO funcionario;
+	private Funcionario funcionario;
 	private BigDecimal valor;
 	private BigDecimal desconto;
 	private LocalDateTime dataHoraAtendimento;
@@ -20,7 +21,7 @@ public class AtendimentoHomeDTO {
 	private EstadoAtendimento estadoAtendimento;
 	private List<String> procedimentos = new ArrayList<>();
 
-	public AtendimentoHomeDTO(Atendimento a, ClienteDTO c, FuncionarioDTO f) {
+	public AtendimentoHomeDTO(Atendimento a, ClienteDTO c, Funcionario f) {
 		id = a.getId();
 		cliente = c;
 		valor = a.getValor();
@@ -64,7 +65,7 @@ public class AtendimentoHomeDTO {
 		return cliente;
 	}
 
-	public FuncionarioDTO getFuncionario() {
+	public Funcionario getFuncionario() {
 		return funcionario;
 	}
 

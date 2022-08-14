@@ -3,7 +3,7 @@ package br.com.jsa.api.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-import br.com.jsa.infra.model.Procedimento;
+import br.com.jsa.dominio.model.Procedimento;
 
 public class DetalheProcedimentoDTO {
 

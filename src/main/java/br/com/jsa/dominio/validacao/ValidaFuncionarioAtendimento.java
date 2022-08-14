@@ -3,8 +3,8 @@ package br.com.jsa.dominio.validacao;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import br.com.jsa.dominio.model.Procedimento;
 import br.com.jsa.infra.exception.NegocioException;
-import br.com.jsa.infra.model.Procedimento;
 
 public class ValidaFuncionarioAtendimento {
 

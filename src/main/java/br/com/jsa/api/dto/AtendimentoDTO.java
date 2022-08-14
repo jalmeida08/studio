@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.jsa.infra.model.Atendimento;
-import br.com.jsa.infra.model.EstadoAtendimento;
+import br.com.jsa.dominio.model.Atendimento;
+import br.com.jsa.dominio.model.EstadoAtendimento;
 
 public class AtendimentoDTO {
 

@@ -1,4 +1,4 @@
-package br.com.jsa.infra.model;
+package br.com.jsa.dominio.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

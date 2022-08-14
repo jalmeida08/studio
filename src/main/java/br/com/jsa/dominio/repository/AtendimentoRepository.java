@@ -1,4 +1,4 @@
-package br.com.jsa.infra.repository;
+package br.com.jsa.dominio.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import br.com.jsa.infra.model.Atendimento;
+import br.com.jsa.dominio.model.Atendimento;
 
 @Repository
 public interface AtendimentoRepository extends MongoRepository<Atendimento, String>{
